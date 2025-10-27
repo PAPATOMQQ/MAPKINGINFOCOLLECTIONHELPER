@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Event Recorder</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --light-gray: #f5f5f5;
+            --border-color: #ddd;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --whatsapp-color: #25D366;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--secondary-color);
+        }
+        
+        .tab {
+            padding: 12px 15px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .tab.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+        
+        .time-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .time-input-group input {
+            flex: 1;
+            min-height: 44px; /* Better touch target */
+        }
+        
+        .time-btn {
+            padding: 12px 15px;
+            background-color: var(--warning-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            min-height: 44px; /* Better touch target */
+        }
+        
+        .time-btn:hover, .time-btn:active {
+            background-color: #e67e22;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -5px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding: 0 5px;
+            min-width: 150px;
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .btn {
+            padding: 14px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            min-height: 44px; /* Better touch target */
+            width: 100%;
+        }
+        
+        .btn:hover, .btn:active {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover, .btn-success:active {
+            background-color: #27ae60;
+        }
+        
+        .btn-whatsapp {
+            background-color: var(--whatsapp-color);
+        }
+        
+        .btn-whatsapp:hover, .btn-whatsapp:active {
+            background-color: #128C7E;
+        }
+        
+        .records-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .record-item {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: var(--light-gray);
+        }
+        
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .record-date {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .record-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .detail-item {
+            margin-bottom: 5px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .no-records {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            min-height: 44px; /* Better touch target */
+            flex: 1;
+        }
+        
+        .action-btn:hover, .action-btn:active {
+            background-color: var(--secondary-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .close-btn:hover, .close-btn:active {
+            color: #333;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .modal-footer .btn {
+            width: auto;
+            flex: 1;
+        }
+        
+        .report-preview {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        /* Mobile-specific improvements */
+        @media (max-width: 768px) {
+            .form-col {
+                flex: 100%;
+            }
+            
+            .record-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-input-group {
+                flex-direction: column;
+            }
+            
+            .time-btn {
+                width: 100%;
+            }
+            
+            .modal-content {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Vehicle Event Recorder</h1>
+            <p>Easy tracking of vehicle event times</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="record">Record Event</button>
+            <button class="tab" data-tab="records">View Records</button>
+        </div>
+        
+        <div class="tab-content active" id="record">
+            <div class="quick-actions">
+                <button class="action-btn" id="setAllArrival">Set All Arrival Times</button>
+                <button class="action-btn" id="setAllDeparture">Set All Departure Times</button>
+                <button class="action-btn" id="setCurrentDateTime">Set Current Date & Time</button>
+            </div>
+            
+            <form id="carRecordForm">
+                <div class="section">
+                    <div class="section-title">Daily Report</div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="date">Date</label>
+                                <div class="time-input-group">
+                                    <input type="date" id="date" required>
+                                    <button type="button" class="time-btn" id="dateNow">Today</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="time">Time</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="time" required>
+                                    <button type="button" class="time-btn" id="timeNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="car">Car</label>
+                                <select id="car" required>
+                                    <option value="">Select a car</option>
+                                    <option value="#1502_VH895_E209">#1502_VH895_E209</option>
+                                    <option value="#1501_GT749_E154">#1501_GT749_E154</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="driver">Driver</label>
+                                <input type="text" id="driver" placeholder="e.g. Sunny Hau" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="operator">Operator</label>
+                        <input type="text" id="operator">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timeArriveWarehouse">Time arrive warehouse</label>
+                        <div class="time-input-group">
+                            <input type="time" id="timeArriveWarehouse">
+                            <button type="button" class="time-btn" id="timeArriveWarehouseNow">Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Before Lunch (AM)</div>
+                    
+                    <div class="form-group">
+                        <label for="missionAM">Mission</label>
+                        <input type="text" id="missionAM">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="towerOnTimeAM">Tower on time</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="towerOnTimeAM">
+                                    <button type="button" class="time-btn" id="towerOnTimeAMNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="towerOnLocationAM">Tower on location</label>
+                                <input type="text" id="towerOnLocationAM">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="collectionStartAM">Collection Start</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="collectionStartAM">
+                                    <button type="button" class="time-btn" id="collectionStartAMNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="collectionEndAM">Collection End</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="collectionEndAM">
+                                    <button type="button" class="time-btn" id="collectionEndAMNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="downtimeBeforeLunch">Downtime before lunch</label>
+                                <input type="text" id="downtimeBeforeLunch">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="lunchPeriod">Lunch period</label>
+                                <input type="text" id="lunchPeriod">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">After Lunch (PM)</div>
+                    
+                    <div class="form-group">
+                        <label for="missionPM">Mission</label>
+                        <input type="text" id="missionPM">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="towerOnTimePM">Tower on time</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="towerOnTimePM">
+                                    <button type="button" class="time-btn" id="towerOnTimePMNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="towerOnLocationPM">Tower on location</label>
+                                <input type="text" id="towerOnLocationPM">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="collectionStartPM">Collection Start (PM)</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="collectionStartPM">
+                                    <button type="button" class="time-btn" id="collectionStartPMNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="collectionEndPM">Collection End (PM)</label>
+                                <div class="time-input-group">
+                                    <input type="time" id="collectionEndPM">
+                                    <button type="button" class="time-btn" id="collectionEndPMNow">Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Additional Information</div>
+                    
+                    <div class="form-group">
+                        <label for="timeLeaveWarehouse">Time leave warehouse</label>
+                        <div class="time-input-group">
+                            <input type="time" id="timeLeaveWarehouse">
+                            <button type="button" class="time-btn" id="timeLeaveWarehouseNow">Now</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="ssdUsed">SSD: % used</label>
+                                <input type="text" id="ssdUsed" placeholder="e.g. 75%">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="startMileage">Start Mileage (km)</label>
+                                <input type="number" id="startMileage" min="0" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="endMileage">End Mileage (km)</label>
+                                <input type="number" id="endMileage" min="0" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="fuelUp">Fuel up (HK$)</label>
+                                <input type="number" id="fuelUp" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="wipesUsed">Wipes used (pcs)</label>
+                                <input type="number" id="wipesUsed" min="0">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="wipesAtCar">Wipes at car</label>
+                                <select id="wipesAtCar">
+                                    <option value="Many">Many</option>
+                                    <option value="Enough">Enough</option>
+                                    <option value="Low">Low</option>
+                                    <option value="None">None</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="remarks">Remark(s)</label>
+                        <textarea id="remarks" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Record</button>
+                    <button type="button" class="btn" id="resetForm">Reset Form</button>
+                    <button type="button" class="btn btn-whatsapp" id="shareWhatsApp">Share via WhatsApp</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="tab-content" id="records">
+            <div class="records-list" id="recordsList">
+                <!-- Records will be dynamically added here -->
+                <div class="no-records">No records found</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Confirm Sharing to WhatsApp</div>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to share this report via WhatsApp?</p>
+                <div class="report-preview" id="reportPreview"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancelShare">Cancel</button>
+                <button class="btn btn-whatsapp" id="confirmShare">Share via WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date and time
+            setCurrentDateTime();
+            
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(targetTab).classList.add('active');
+                    
+                    // If viewing records tab, refresh records list
+                    if (targetTab === 'records') {
+                        displayRecords();
+                    }
+                });
+            });
+            
+            // Form submission handling
+            document.getElementById('carRecordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Collect form data
+                const formData = {
+                    date: document.getElementById('date').value,
+                    time: document.getElementById('time').value,
+                    car: document.getElementById('car').value,
+                    driver: document.getElementById('driver').value,
+                    operator: document.getElementById('operator').value,
+                    timeArriveWarehouse: document.getElementById('timeArriveWarehouse').value,
+                    missionAM: document.getElementById('missionAM').value,
+                    towerOnTimeAM: document.getElementById('towerOnTimeAM').value,
+                    towerOnLocationAM: document.getElementById('towerOnLocationAM').value,
+                    collectionStartAM: document.getElementById('collectionStartAM').value,
+                    collectionEndAM: document.getElementById('collectionEndAM').value,
+                    downtimeBeforeLunch: document.getElementById('downtimeBeforeLunch').value,
+                    lunchPeriod: document.getElementById('lunchPeriod').value,
+                    missionPM: document.getElementById('missionPM').value,
+                    towerOnTimePM: document.getElementById('towerOnTimePM').value,
+                    towerOnLocationPM: document.getElementById('towerOnLocationPM').value,
+                    collectionStartPM: document.getElementById('collectionStartPM').value,
+                    collectionEndPM: document.getElementById('collectionEndPM').value,
+                    timeLeaveWarehouse: document.getElementById('timeLeaveWarehouse').value,
+                    ssdUsed: document.getElementById('ssdUsed').value,
+                    startMileage: document.getElementById('startMileage').value,
+                    endMileage: document.getElementById('endMileage').value,
+                    fuelUp: document.getElementById('fuelUp').value,
+                    wipesUsed: document.getElementById('wipesUsed').value,
+                    wipesAtCar: document.getElementById('wipesAtCar').value,
+                    remarks: document.getElementById('remarks').value
+                };
+                
+                // Save to localStorage
+                saveRecord(formData);
+                
+                // Show success message
+                alert('Record saved successfully!');
+                
+                // Reset form
+                this.reset();
+                
+                // Set current date and time
+                setCurrentDateTime();
+            });
+            
+            // Reset form button
+            document.getElementById('resetForm').addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                    document.getElementById('carRecordForm').reset();
+                    
+                    // Set current date and time
+                    setCurrentDateTime();
+                }
+            });
+            
+            // WhatsApp share button
+            document.getElementById('shareWhatsApp').addEventListener('click', function() {
+                // Generate report preview
+                const reportText = generateReportText();
+                document.getElementById('reportPreview').textContent = reportText;
+                
+                // Show confirmation modal
+                document.getElementById('confirmationModal').style.display = 'flex';
+            });
+            
+            // Close modal button
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('confirmationModal').style.display = 'none';
+            });
+            
+            // Cancel share button
+            document.getElementById('cancelShare').addEventListener('click', function() {
+                document.getElementById('confirmationModal').style.display = 'none';
+            });
+            
+            // Confirm share button
+            document.getElementById('confirmShare').addEventListener('click', function() {
+                const reportText = generateReportText();
+                shareToWhatsApp(reportText);
+                document.getElementById('confirmationModal').style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('confirmationModal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Save record to localStorage
+            function saveRecord(record) {
+                let records = JSON.parse(localStorage.getItem('carRecords')) || [];
+                records.push({
+                    ...record,
+                    id: Date.now() // Use timestamp as unique ID
+                });
+                localStorage.setItem('carRecords', JSON.stringify(records));
+            }
+            
+            // Display all records
+            function displayRecords() {
+                const recordsList = document.getElementById('recordsList');
+                const records = JSON.parse(localStorage.getItem('carRecords')) || [];
+                
+                if (records.length === 0) {
+                    recordsList.innerHTML = '<div class="no-records">No records found</div>';
+                    return;
+                }
+                
+                // Sort by date (newest first)
+                records.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+                
+                recordsList.innerHTML = '';
+                
+                records.forEach(record => {
+                    const recordElement = document.createElement('div');
+                    recordElement.className = 'record-item';
+                    
+                    const dateObj = new Date(record.date);
+                    const formattedDate = `${dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                    
+                    recordElement.innerHTML = `
+                        <div class="record-header">
+                            <div class="record-date">${formattedDate} ${record.time}</div>
+                            <div class="record-car">${record.car}</div>
+                        </div>
+                        <div class="record-details">
+                            <div class="detail-item"><span class="detail-label">Driver:</span> ${record.driver}</div>
+                            <div class="detail-item"><span class="detail-label">Operator:</span> ${record.operator || 'Not specified'}</div>
+                            <div class="detail-item"><span class="detail-label">Arrive warehouse:</span> ${record.timeArriveWarehouse || 'Not specified'}</div>
+                            <div class="detail-item"><span class="detail-label">Leave warehouse:</span> ${record.timeLeaveWarehouse || 'Not specified'}</div>
+                            <div class="detail-item"><span class="detail-label">Mileage:</span> ${record.startMileage || '0'} - ${record.endMileage || '0'} km</div>
+                            <div class="detail-item"><span class="detail-label">SSD used:</span> ${record.ssdUsed || 'Not specified'}</div>
+                        </div>
+                        <div class="detail-item"><span class="detail-label">Remarks:</span> ${record.remarks || 'None'}</div>
+                    `;
+                    
+                    recordsList.appendChild(recordElement);
+                });
+            }
+            
+            // Function to set current date and time
+            function setCurrentDateTime() {
+                const now = new Date();
+                document.getElementById('date').valueAsDate = now;
+                document.getElementById('time').value = formatTimeForInput(now);
+            }
+            
+            // Function to get current time in HH:MM format
+            function getCurrentTime() {
+                const now = new Date();
+                return formatTimeForInput(now);
+            }
+            
+            // Format time for input[type=time] - specifically for mobile compatibility
+            function formatTimeForInput(date) {
+                return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            }
+            
+            // Set current date button
+            document.getElementById('dateNow').addEventListener('click', function() {
+                document.getElementById('date').valueAsDate = new Date();
+            });
+            
+            // Set current time buttons - using touch events for mobile
+            function setupTimeButton(buttonId, inputId) {
+                const button = document.getElementById(buttonId);
+                const input = document.getElementById(inputId);
+                
+                // Add both click and touch events for maximum compatibility
+                button.addEventListener('click', function() {
+                    input.value = getCurrentTime();
+                    // Trigger change event to ensure all browsers recognize the change
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                
+                // Also add touch event for mobile devices
+                button.addEventListener('touchend', function(e) {
+                    e.preventDefault(); // Prevent default to avoid potential issues
+                    input.value = getCurrentTime();
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            }
+            
+            // Set up all time buttons
+            setupTimeButton('timeNow', 'time');
+            setupTimeButton('timeArriveWarehouseNow', 'timeArriveWarehouse');
+            setupTimeButton('towerOnTimeAMNow', 'towerOnTimeAM');
+            setupTimeButton('collectionStartAMNow', 'collectionStartAM');
+            setupTimeButton('collectionEndAMNow', 'collectionEndAM');
+            setupTimeButton('towerOnTimePMNow', 'towerOnTimePM');
+            setupTimeButton('collectionStartPMNow', 'collectionStartPM');
+            setupTimeButton('collectionEndPMNow', 'collectionEndPM');
+            setupTimeButton('timeLeaveWarehouseNow', 'timeLeaveWarehouse');
+            
+            // Quick action buttons
+            document.getElementById('setAllArrival').addEventListener('click', function() {
+                const currentTime = getCurrentTime();
+                document.getElementById('timeArriveWarehouse').value = currentTime;
+                document.getElementById('towerOnTimeAM').value = currentTime;
+                document.getElementById('collectionStartAM').value = currentTime;
+            });
+            
+            document.getElementById('setAllDeparture').addEventListener('click', function() {
+                const currentTime = getCurrentTime();
+                document.getElementById('collectionEndAM').value = currentTime;
+                document.getElementById('towerOnTimePM').value = currentTime;
+                document.getElementById('collectionStartPM').value = currentTime;
+                document.getElementById('collectionEndPM').value = currentTime;
+                document.getElementById('timeLeaveWarehouse').value = currentTime;
+            });
+            
+            document.getElementById('setCurrentDateTime').addEventListener('click', function() {
+                setCurrentDateTime();
+            });
+            
+            // Generate report text
+            function generateReportText() {
+                const date = document.getElementById('date').value;
+                const time = document.getElementById('time').value;
+                const car = document.getElementById('car').value;
+                const driver = document.getElementById('driver').value;
+                const operator = document.getElementById('operator').value;
+                const timeArriveWarehouse = document.getElementById('timeArriveWarehouse').value;
+                const missionAM = document.getElementById('missionAM').value;
+                const towerOnTimeAM = document.getElementById('towerOnTimeAM').value;
+                const towerOnLocationAM = document.getElementById('towerOnLocationAM').value;
+                const collectionStartAM = document.getElementById('collectionStartAM').value;
+                const collectionEndAM = document.getElementById('collectionEndAM').value;
+                const downtimeBeforeLunch = document.getElementById('downtimeBeforeLunch').value;
+                const lunchPeriod = document.getElementById('lunchPeriod').value;
+                const missionPM = document.getElementById('missionPM').value;
+                const towerOnTimePM = document.getElementById('towerOnTimePM').value;
+                const towerOnLocationPM = document.getElementById('towerOnLocationPM').value;
+                const collectionStartPM = document.getElementById('collectionStartPM').value;
+                const collectionEndPM = document.getElementById('collectionEndPM').value;
+                const timeLeaveWarehouse = document.getElementById('timeLeaveWarehouse').value;
+                const ssdUsed = document.getElementById('ssdUsed').value;
+                const startMileage = document.getElementById('startMileage').value;
+                const endMileage = document.getElementById('endMileage').value;
+                const fuelUp = document.getElementById('fuelUp').value;
+                const wipesUsed = document.getElementById('wipesUsed').value;
+                const wipesAtCar = document.getElementById('wipesAtCar').value;
+                const remarks = document.getElementById('remarks').value;
+                
+                // Format date for display
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                // Generate report text
+                let report = `Daily Report\n`;
+                report += `Date: ${formattedDate}, ${time}\n`;
+                report += `Car: ${car}\n`;
+                report += `Driver: ${driver}\n`;
+                report += `Operator: ${operator || 'N/A'}\n`;
+                report += `Time arrive warehouse: ${timeArriveWarehouse || 'N/A'}\n\n`;
+                
+                report += `Before Lunch (AM):\n`;
+                report += `Mission: ${missionAM || 'N/A'}\n`;
+                report += `Tower on time: ${towerOnTimeAM || 'N/A'}\n`;
+                report += `Tower on location: ${towerOnLocationAM || 'N/A'}\n`;
+                report += `Collection Start: ${collectionStartAM || 'N/A'}\n`;
+                report += `Collection End: ${collectionEndAM || 'N/A'}\n`;
+                report += `Downtime before lunch: ${downtimeBeforeLunch || 'N/A'}\n`;
+                report += `Lunch period: ${lunchPeriod || 'N/A'}\n\n`;
+                
+                report += `After Lunch (PM):\n`;
+                report += `Mission: ${missionPM || 'N/A'}\n`;
+                report += `Tower on time: ${towerOnTimePM || 'N/A'}\n`;
+                report += `Tower on location: ${towerOnLocationPM || 'N/A'}\n`;
+                report += `Collection Start (PM): ${collectionStartPM || 'N/A'}\n`;
+                report += `Collection End (PM): ${collectionEndPM || 'N/A'}\n\n`;
+                
+                report += `Time leave warehouse: ${timeLeaveWarehouse || 'N/A'}\n`;
+                report += `SSD: % used ${ssdUsed || 'N/A'}\n`;
+                report += `Start Mileage: ${startMileage || '0'} km\n`;
+                report += `End Mileage: ${endMileage || '0'} km\n`;
+                report += `Fuel up: HK$${fuelUp || '0'}\n`;
+                report += `Wipes used: ${wipesUsed || '0'} pcs\n`;
+                report += `Wipes at car: ${wipesAtCar || 'N/A'}\n`;
+                report += `Remark(s): ${remarks || 'N/A'}`;
+                
+                return report;
+            }
+            
+            // Share to WhatsApp
+            function shareToWhatsApp(reportText) {
+                // Encode the report text for URL
+                const encodedText = encodeURIComponent(reportText);
+                
+                // Create WhatsApp share URL
+                const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+                
+                // Open WhatsApp in a new tab
+                window.open(whatsappUrl, '_blank');
+            }
+        });
+    </script>
+</body>
+</html>
